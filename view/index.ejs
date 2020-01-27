@@ -2,63 +2,137 @@
 <html>
 
 <head>
-    <title>List Book</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <title>Book</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <h1>Add Book</h1>
-        <form class="add-book-form" action="/addBook" method="post">
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Name" required>
-                </div>
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control" name="author" id="author" placeholder="Author"
-                        required>
-                </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" id="panelHeading">Add Book</div>
+            <div class="panel-body">
+                <form id="formInput" action="/addBook" method="post" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <p>Name</p>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Name" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <p>Author</p>
+                            <input type="text" class="form-control" name="author" id="author" placeholder="Author"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <p>Description</p>
+                            <input type="text" class="form-control" name="description" id="description"
+                                placeholder="Description" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <p>Image</p>
+                            <input type="file" name="image" id="bookImg" class="form-control-file border" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <input type="hidden" class="form-control" name="id" id="id">
+                            <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
+                            <a style="display:none;" id="cancelButton" class="btn btn-default"
+                                onclick="addFunction();">Cancel</a>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control" name="description" id="description" placeholder="Description" required>
-                </div>
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control" name="image" id="image" placeholder="Image"
-                        >
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary float-right">Add</button>
-        </form>
-        <h1>List Book</h1>
-        <div class="col-md-12">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Author</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% books.forEach((book, index) => { %>
-                    <tr>
-                        <td><%= index + 1 %></td>
-                        <td><%= book.name %></td>
-                        <td><%= book.description %></td>
-                        <td><%= book.author %></td>
-                        <td><a href="/editBook" class="btn btn-warning">Edit</a></td>
-                        <td><a href="/deleteBook" class="btn btn-danger">Delete</a></td>
-                    </tr>
-                    <% }); %>
-                </tbody>
-            </table>
         </div>
-
+        <div class="panel panel-default">
+            <div class="panel-heading">List Book</div>
+            <div class="panel-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Author</th>
+                            <th>Image</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% books.forEach((book, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= book.name %></td>
+                            <td><%= book.description %></td>
+                            <td><%= book.author %></td>
+                            <td><img src="<%= book.image %>" width="80" height="120" class="img-rounded"
+                                    alt="<%= book.name %>"></td>
+                            <td>
+                                <a id="<%= book.id %>" name="<%= book.name %>" description="<%= book.description %>"
+                                    author="<%= book.author %>" class="btn btn-default"
+                                    onclick="updateFunction(this);"><i class="glyphicon glyphicon-pencil"></i>
+                                    Edit</a>
+                                <a id="/deleteBook/<%= book.id %>" data-toggle="modal" data-target="#deleteModal"
+                                    class="btn btn-danger" onclick="deleteFunction(this);"><i
+                                        class="glyphicon glyphicon-trash"></i>
+                                    Delete</a>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default" data-dismiss="modal">No</a>
+                    <a id="deleteButton" href="" class="btn btn-danger">Yes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
+<script>
+    var deleteButton = document.getElementById("deleteButton");
+    var nameInput = document.getElementById("name");
+    var descriptionInput = document.getElementById("description");
+    var authorInput = document.getElementById("author");
+    var idInput = document.getElementById("id");
+    var image = document.getElementById("bookImg");
+    function deleteFunction(elem) {
+        deleteButton.href = elem.getAttribute("id");
+    }
+    function updateFunction(elem) {
+        nameInput.value = elem.getAttribute("name");
+        descriptionInput.value = elem.getAttribute("description");
+        authorInput.value = elem.getAttribute("author");
+        idInput.value = elem.getAttribute("id");
+        document.getElementById("submitButton").innerHTML = "Edit";
+        document.getElementById("panelHeading").innerHTML = "Edit Book";
+        document.getElementById("cancelButton").style.display = "";
+        document.getElementById("formInput").action = "/editBook";
+        image.removeAttribute("required");
+    }
+    function addFunction() {
+        nameInput.value = '';
+        descriptionInput.value = '';
+        authorInput.value = '';
+        document.getElementById("submitButton").innerHTML = "Add";
+        document.getElementById("panelHeading").innerHTML = "Add Book";
+        document.getElementById("cancelButton").style.display = "none";
+        document.getElementById("formInput").action = "/addBook";
+        image.setAttribute("required", "");
+    }
+</script>
 
 </html>
